@@ -1,5 +1,8 @@
 # 经济自由本金计算器 · 2026
 
+> 在线版：https://yugegezhenshuaia.github.io/economic-freedom-calculator/  
+> 仓库：https://github.com/yugegezhenshuaia/economic-freedom-calculator
+
 一个面向中国个人/家庭的经济自由（FIRE）本金模型：把支出、通胀、社保养老金、医疗、长期护理、子女、大额支出、长寿、收益序列和黑天鹅放在同一条现金流里，用蒙特卡洛和压力测试回答：
 
 > 今天至少需要多少可投资净资产，才能在目标置信度下不再靠工作收入生活？
