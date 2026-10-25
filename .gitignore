@@ -3,3 +3,6 @@ __pycache__/
 src/_engine_test.js
 data/js_cases.json
 data/py_cases.json
+
+*.zip
+
