@@ -1,0 +1,248 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "asOf": "2026-10",
+    "currency": "CNY",
+    "unit": "元",
+    "title": "经济自由本金计算器",
+    "note": "所有金额输入均为今天（2026年）的购买力。模型输出是概率意义上的‘够’，不是保证。"
+  },
+  "household": {
+    "adults": 2,
+    "age": 40,
+    "spouseAge": 38,
+    "fiAge": 40,
+    "planUntil": 100,
+    "longevityMode": "stochastic",
+    "selfSex": "male",
+    "spouseSex": "female",
+    "singleSpendingFactor": 0.72
+  },
+  "spending": {
+    "monthly": {
+      "food": 5000,
+      "housing": 3000,
+      "transport": 1800,
+      "clothing": 800,
+      "leisure": 1200,
+      "social": 1000,
+      "medical": 1000,
+      "insurance": 0,
+      "childcare": 0,
+      "education": 0,
+      "other": 1200
+    },
+    "retirementFactor": 0.9,
+    "curve": [
+      [
+        0,
+        1.0
+      ],
+      [
+        75,
+        0.9
+      ],
+      [
+        85,
+        0.8
+      ],
+      [
+        95,
+        0.7
+      ]
+    ],
+    "oneOffs": [
+      {
+        "name": "换车",
+        "amount": 180000,
+        "startAge": 48,
+        "every": 8,
+        "endAge": 80
+      },
+      {
+        "name": "房屋装修/维修",
+        "amount": 200000,
+        "startAge": 50,
+        "every": 15,
+        "endAge": 80
+      },
+      {
+        "name": "长途旅行",
+        "amount": 60000,
+        "startAge": 45,
+        "every": 5,
+        "endAge": 80
+      }
+    ]
+  },
+  "children": [
+    {
+      "age": 6,
+      "path": "public",
+      "multiplier": 1.0,
+      "supportUntil": 22,
+      "postgrad": false,
+      "marriageSupport": 0,
+      "marriageAge": 28
+    }
+  ],
+  "parents": {
+    "annualSupport": 0,
+    "years": 0,
+    "medicalReserve": 0
+  },
+  "housing": {
+    "homeValue": 3000000,
+    "mortgageBalance": 1000000,
+    "mortgageRate": 0.032,
+    "mortgageYearsLeft": 15,
+    "sellAge": 0,
+    "sellCostRate": 0.03,
+    "rentAfterSell": 6000,
+    "houseGrowth": 0.0,
+    "propertyTaxRate": 0.0
+  },
+  "income": {
+    "salary": 0,
+    "spouseSalary": 0,
+    "salaryGrowth": 0.03,
+    "savingsMode": "auto",
+    "savingsAnnual": 0,
+    "pensionMode": "formula",
+    "pensionMonthly": 0,
+    "spousePensionMonthly": 0,
+    "pensionStartAge": 63,
+    "spousePensionStartAge": 58,
+    "pensionCOLA": 0.02,
+    "partTimeAnnual": 0,
+    "partTimeYears": 0,
+    "rentalAnnual": 0,
+    "oneTimeInflows": []
+  },
+  "social": {
+    "contribYears": 25,
+    "contributionIndex": 1.2,
+    "personalAccount": 250000,
+    "localAverageWage": 9000,
+    "spouseContribYears": 22,
+    "spouseContributionIndex": 1.0,
+    "spousePersonalAccount": 180000,
+    "spouseLocalAverageWage": 9000,
+    "minContribYears": 20,
+    "accountRate": 0.03,
+    "socialWageGrowth": 0.03
+  },
+  "investment": {
+    "allocation": {
+      "cnEquity": 0.3,
+      "globalEquity": 0.3,
+      "bonds": 0.3,
+      "cash": 0.1,
+      "gold": 0.0,
+      "other": 0.0
+    },
+    "overrideReturn": null,
+    "overrideVol": null,
+    "fee": 0.006,
+    "taxDrag": 0.002,
+    "cashReturn": 0.015,
+    "expected": {
+      "cnEquity": 0.075,
+      "globalEquity": 0.07,
+      "bonds": 0.022,
+      "cash": 0.015,
+      "gold": 0.03,
+      "other": 0.05
+    },
+    "vol": {
+      "cnEquity": 0.22,
+      "globalEquity": 0.16,
+      "bonds": 0.04,
+      "cash": 0.01,
+      "gold": 0.15,
+      "other": 0.15
+    },
+    "corr": {
+      "cnEquity-globalEquity": 0.6,
+      "cnEquity-bonds": -0.1,
+      "cnEquity-cash": 0.0,
+      "cnEquity-gold": 0.1,
+      "cnEquity-other": 0.5,
+      "globalEquity-bonds": -0.05,
+      "globalEquity-cash": 0.0,
+      "globalEquity-gold": 0.15,
+      "globalEquity-other": 0.4,
+      "bonds-cash": 0.2,
+      "bonds-gold": 0.1,
+      "bonds-other": 0.1,
+      "cash-gold": 0.0,
+      "cash-other": 0.0,
+      "gold-other": 0.1
+    }
+  },
+  "insurance": {
+    "annualPremium": 12000,
+    "premiumRealGrowth": 0.03,
+    "medicalReimbursement": 0.7,
+    "commercialCoverage": 0.6,
+    "deductible": 10000,
+    "eligibleShare": 0.8
+  },
+  "risk": {
+    "confidence": 0.9,
+    "bequest": 0,
+    "simulations": 4000,
+    "seed": 20261025,
+    "inflationMean": 0.02,
+    "inflationVol": 0.012,
+    "inflationPersistence": 0.55,
+    "medicalInflationSpread": 0.03,
+    "educationInflationSpread": 0.03,
+    "housingInflationSpread": 0.0,
+    "returnModel": "student-t",
+    "tdf": 5,
+    "crashProb": 0.03,
+    "crashSize": -0.2,
+    "returnInflationCorr": -0.2,
+    "medicalShockBaseProb": 0.006,
+    "medicalShockAgeSlope": 0.0002,
+    "medicalShockMedian": 150000,
+    "medicalShockSigma": 0.85,
+    "ltcBaseProb": 0.005,
+    "ltcAgeSlope": 0.0015,
+    "ltcCostMonthly": 8000,
+    "ltcDurationYears": 4,
+    "ltcCoverage": 0.0,
+    "ltcLivingOffset": 0.2,
+    "longevityScale": 1.0
+  },
+  "childCostTable": {
+    "public": {
+      "0-2": 18000,
+      "3-5": 20000,
+      "6-11": 20000,
+      "12-14": 24000,
+      "15-17": 26000,
+      "18-21": 35000,
+      "22-24": 40000
+    },
+    "private": {
+      "0-2": 40000,
+      "3-5": 55000,
+      "6-11": 65000,
+      "12-14": 75000,
+      "15-17": 85000,
+      "18-21": 110000,
+      "22-24": 140000
+    },
+    "international": {
+      "0-2": 70000,
+      "3-5": 100000,
+      "6-11": 150000,
+      "12-14": 170000,
+      "15-17": 190000,
+      "18-21": 280000,
+      "22-24": 330000
+    }
+  }
+}

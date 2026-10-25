@@ -1,0 +1,173 @@
+[
+  {
+    "name": "base",
+    "override": {}
+  },
+  {
+    "name": "single",
+    "override": {
+      "household": {
+        "adults": 1,
+        "age": 32,
+        "fiAge": 32
+      },
+      "assets": 1500000,
+      "children": [],
+      "spending": {
+        "monthly": {
+          "food": 2500,
+          "housing": 3500,
+          "transport": 800,
+          "clothing": 500,
+          "leisure": 800,
+          "social": 500,
+          "medical": 500,
+          "insurance": 0,
+          "other": 500
+        }
+      },
+      "housing": {
+        "homeValue": 0,
+        "mortgageBalance": 0,
+        "mortgageYearsLeft": 0
+      }
+    }
+  },
+  {
+    "name": "retired",
+    "override": {
+      "household": {
+        "age": 65,
+        "spouseAge": 63,
+        "fiAge": 65
+      },
+      "assets": 5000000,
+      "children": [],
+      "spending": {
+        "monthly": {
+          "food": 4000,
+          "housing": 2500,
+          "transport": 800,
+          "clothing": 500,
+          "leisure": 1000,
+          "social": 800,
+          "medical": 2000,
+          "insurance": 0,
+          "other": 800
+        }
+      },
+      "housing": {
+        "homeValue": 3000000,
+        "mortgageBalance": 0,
+        "mortgageYearsLeft": 0
+      },
+      "income": {
+        "pensionMode": "direct",
+        "pensionMonthly": 5500,
+        "spousePensionMonthly": 3800
+      }
+    }
+  },
+  {
+    "name": "high_spend",
+    "override": {
+      "spending": {
+        "monthly": {
+          "food": 9000,
+          "housing": 9000,
+          "transport": 3000,
+          "clothing": 1500,
+          "leisure": 3000,
+          "social": 2000,
+          "medical": 2000,
+          "insurance": 0,
+          "other": 2000
+        }
+      }
+    }
+  },
+  {
+    "name": "low_return",
+    "override": {
+      "investment": {
+        "overrideReturn": 0.02
+      }
+    }
+  },
+  {
+    "name": "no_pension",
+    "override": {
+      "income": {
+        "pensionMode": "none"
+      }
+    }
+  },
+  {
+    "name": "no_children",
+    "override": {
+      "children": []
+    }
+  },
+  {
+    "name": "long_life",
+    "override": {
+      "household": {
+        "planUntil": 105
+      }
+    }
+  },
+  {
+    "name": "bequest",
+    "override": {
+      "risk": {
+        "bequest": 2000000
+      }
+    }
+  },
+  {
+    "name": "high_assets",
+    "override": {
+      "assets": 20000000
+    }
+  },
+  {
+    "name": "zero_spend",
+    "override": {
+      "spending": {
+        "monthly": {
+          "food": 0,
+          "housing": 0,
+          "transport": 0,
+          "clothing": 0,
+          "leisure": 0,
+          "social": 0,
+          "medical": 0,
+          "insurance": 0,
+          "other": 0
+        },
+        "oneOffs": []
+      },
+      "children": [],
+      "parents": {
+        "annualSupport": 0,
+        "years": 0,
+        "medicalReserve": 0
+      },
+      "housing": {
+        "homeValue": 0,
+        "mortgageBalance": 0,
+        "mortgageYearsLeft": 0
+      },
+      "insurance": {
+        "annualPremium": 0
+      },
+      "risk": {
+        "medicalShockBaseProb": 0,
+        "medicalShockAgeSlope": 0,
+        "ltcBaseProb": 0,
+        "ltcAgeSlope": 0,
+        "ltcCostMonthly": 0
+      }
+    }
+  }
+]

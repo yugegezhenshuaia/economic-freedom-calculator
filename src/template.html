@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>经济自由本金计算器 · 2026</title>
+<meta name="description" content="用蒙特卡洛、通胀分项、社保养老金、医疗与长期护理风险，估算一个中国个人或家庭不再工作所需的本金。">
+<style>__STYLES__</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">自</div>
+      <div>
+        <h1>经济自由本金计算器</h1>
+        <p class="sub">把“够不够”拆成现金流、概率与风险 · 不是收益率承诺，是一张决策地图</p>
+      </div>
+    </div>
+    <div class="badges">
+      <span class="badge">数据截至 <strong>2026-10</strong></span>
+      <span class="badge">人民币 · 今天币值</span>
+      <span class="badge">蒙特卡洛 + 压力测试</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ================= 左侧参数 ================= -->
+    <aside class="sidebar card" id="sidebar">
+      <div class="panel-head">
+        <h2>你的参数</h2>
+        <p>先改“家庭 / 开支 / 收入”，高级参数可保持默认。</p>
+      </div>
+      <div class="presets" id="presets">
+        <button class="preset" data-preset="default">二线三口之家</button>
+        <button class="preset" data-preset="tier1">一线四口</button>
+        <button class="preset" data-preset="single">二线单身</button>
+        <button class="preset" data-preset="dink">丁克家庭</button>
+        <button class="preset" data-preset="retired">已退休</button>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="family">家庭</button>
+        <button class="tab" data-tab="spending">开支</button>
+        <button class="tab" data-tab="income">收入社保</button>
+        <button class="tab" data-tab="invest">投资</button>
+        <button class="tab" data-tab="risk">风险</button>
+        <button class="tab" data-tab="advanced">高级</button>
+      </div>
+
+      <div class="tab-panel active" data-panel="family">
+        <div class="group">
+          <div class="group-title">家庭结构 <span>决定寿命与支出</span></div>
+          <div class="field">
+            <label>成年人数量</label>
+            <div class="seg" id="adults-seg">
+              <button data-adults="1">1 人</button>
+              <button data-adults="2" class="active">2 人</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>你的年龄 <span class="hint">周岁</span></label>
+            <div class="input-wrap"><input type="number" data-path="household.age" min="18" max="90" step="1"><span class="suffix">岁</span></div>
+          </div>
+          <div class="field spouse-only">
+            <label>配偶年龄 <span class="hint">周岁</span></label>
+            <div class="input-wrap"><input type="number" data-path="household.spouseAge" min="18" max="90" step="1"><span class="suffix">岁</span></div>
+          </div>
+          <div class="field">
+            <label>计划停止工作年龄 <span class="hint">现在不工作就填当前年龄</span></label>
+            <div class="input-wrap"><input type="number" data-path="household.fiAge" min="18" max="90" step="1"><span class="suffix">岁</span></div>
+          </div>
+          <div class="field">
+            <label>规划到多少岁 <span class="hint">保守建议 100，压力测试到 105</span></label>
+            <div class="input-wrap"><input type="number" data-path="household.planUntil" min="70" max="110" step="1"><span class="suffix">岁</span></div>
+          </div>
+          <div class="field">
+            <label>寿命假设</label>
+            <div class="input-wrap"><select data-path="household.longevityMode">
+              <option value="stochastic">按生命表随机（推荐）</option>
+              <option value="fixed">固定活到规划年龄</option>
+            </select></div>
+          </div>
+          <div class="field">
+            <label>当前可投资净资产 <span class="hint">不含自住房</span></label>
+            <div class="input-wrap"><input type="number" data-path="assets" data-unit="wan" min="0" step="1"><span class="suffix">万元</span></div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-title">子女 <span>养育到独立</span></div>
+          <div class="field">
+            <label>子女数量</label>
+            <div class="input-wrap"><select id="children-count">
+              <option value="0">0 个</option>
+              <option value="1">1 个</option>
+              <option value="2">2 个</option>
+              <option value="3">3 个</option>
+            </select></div>
+          </div>
+          <div id="children-list"></div>
+          <p class="help">子女成本按“增量成本”估算，已排除家庭共同住房；教育路线见默认表。</p>
+        </div>
+
+        <div class="group">
+          <div class="group-title">父母赡养 <span>可选</span></div>
+          <div class="field">
+            <label>每年赡养费</label>
+            <div class="input-wrap"><input type="number" data-path="parents.annualSupport" data-unit="wan" min="0" step="0.1"><span class="suffix">万元/年</span></div>
+          </div>
+          <div class="field">
+            <label>预计持续年数</label>
+            <div class="input-wrap"><input type="number" data-path="parents.years" min="0" max="50" step="1"><span class="suffix">年</span></div>
+          </div>
+          <div class="field">
+            <label>父母医疗备用金 <span class="hint">期初一次性扣除</span></label>
+            <div class="input-wrap"><input type="number" data-path="parents.medicalReserve" data-unit="wan" min="0" step="1"><span class="suffix">万元</span></div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-title">住房 <span>自住房不计入本金</span></div>
+          <div class="field">
+            <label>自住房当前价值</label>
+            <div class="input-wrap"><input type="number" data-path="housing.homeValue" data-unit="wan" min="0" step="1"><span class="suffix">万元</span></div>
+          </div>
+          <div class="field">
+            <label>房贷余额</label>
+            <div class="input-wrap"><input type="number" data-path="housing.mortgageBalance" data-unit="wan" min="0" step="1"><span class="suffix">万元</span></div>
+          </div>
+          <div class="field">
+            <label>房贷利率</label>
+            <div class="input-wrap"><input type="number" data-path="housing.mortgageRate" data-unit="pct" min="0" max="15" step="0.05"><span class="suffix">%</span></div>
+          </div>
+          <div class="field">
+            <label>房贷剩余年限</label>
+            <div class="input-wrap"><input type="number" data-path="housing.mortgageYearsLeft" min="0" max="40" step="1"><span class="suffix">年</span></div>
+          </div>
+          <div class="field">
+            <label>计划卖房年龄 <span class="hint">0 = 不卖</span></label>
+            <div class="input-wrap"><input type="number" data-path="housing.sellAge" min="0" max="100" step="1"><span class="suffix">岁</span></div>
+          </div>
+          <div class="field">
+            <label>卖房后月租金</label>
+            <div class="input-wrap"><input type="number" data-path="housing.rentAfterSell" min="0" step="100"><span class="suffix">元/月</span></div>
+          </div>
+          <div class="field">
+            <label>卖房交易税费</label>
+            <div class="input-wrap"><input type="number" data-path="housing.sellCostRate" data-unit="pct" min="0" max="15" step="0.5"><span class="suffix">%</span></div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-title">保险 <span>医保之外</span></div>
+          <div class="field">
+            <label>当前商业保险年保费 <span class="hint">全家合计</span></label>
+            <div class="input-wrap"><input type="number" data-path="insurance.annualPremium" min="0" step="500"><span class="suffix">元/年</span></div>
+          </div>
+          <div class="field">
+            <label>保费实际增长率 <span class="hint">随年龄上升</span></label>
+            <div class="input-wrap"><input type="number" data-path="insurance.premiumRealGrowth" data-unit="pct" min="0" max="15" step="0.5"><span class="suffix">%/年</span></div>
+          </div>
+          <div class="field">
+            <label>医保目录内报销比例</label>
+            <div class="input-wrap"><input type="number" data-path="insurance.medicalReimbursement" data-unit="pct" min="0" max="100" step="1"><span class="suffix">%</span></div>
+          </div>
+          <div class="field">
+            <label>百万医疗补充比例</label>
+            <div class="input-wrap"><input type="number" data-path="insurance.commercialCoverage" data-unit="pct" min="0" max="100" step="1"><span class="suffix">%</span></div>
+          </div>
+          <div class="field">
+            <label>可报销费用占比 <span class="hint">目录外/封顶/拒赔的折减</span></label>
+            <div class="input-wrap"><input type="number" data-path="insurance.eligibleShare" data-unit="pct" min="0" max="100" step="1"><span class="suffix">%</span></div>
+          </div>
+          <div class="field">
+            <label>免赔额</label>
+            <div class="input-wrap"><input type="number" data-path="insurance.deductible" min="0" step="1000"><span class="suffix">元</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="spending">
+        <div class="group">
+          <div class="group-title">基础生活 <span>元/月，不含房贷/保险</span></div>
+          <div class="field"><label>餐饮食品</label><div class="input-wrap"><input type="number" data-path="spending.monthly.food" min="0" step="100"><span class="suffix">元/月</span></div></div>
+          <div class="field"><label>居住 / 物业 / 水电</label><div class="input-wrap"><input type="number" data-path="spending.monthly.housing" min="0" step="100"><span class="suffix">元/月</span></div></div>
+          <div class="field"><label>交通通讯</label><div class="input-wrap"><input type="number" data-path="spending.monthly.transport" min="0" step="100"><span class="suffix">元/月</span></div></div>
+          <div class="field"><label>衣着日用</label><div class="input-wrap"><input type="number" data-path="spending.monthly.clothing" min="0" step="100"><span class="suffix">元/月</span></div></div>
+          <div class="field"><label>娱乐 / 旅游 / 文化</label><div class="input-wrap"><input type="number" data-path="spending.monthly.leisure" min="0" step="100"><span class="suffix">元/月</span></div></div>
+          <div class="field"><label>人情 / 社交</label><div class="input-wrap"><input type="number" data-path="spending.monthly.social" min="0" step="100"><span class="suffix">元/月</span></div></div>
+          <div class="field"><label>其他 / 不可预见</label><div class="input-wrap"><input type="number" data-path="spending.monthly.other" min="0" step="100"><span class="suffix">元/月</span></div></div>
+        </div>
+        <div class="group">
+          <div class="group-title">医疗与年龄曲线</div>
+          <div class="field"><label>日常医疗 / 体检 / 牙科</label><div class="input-wrap"><input type="number" data-path="spending.monthly.medical" min="0" step="100"><span class="suffix">元/月</span></div></div>
+          <div class="field"><label>退休后基础支出比例</label><div class="input-wrap"><input type="number" data-path="spending.retirementFactor" data-unit="pct" min="30" max="150" step="1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>75 岁时支出系数</label><div class="input-wrap"><input type="number" data-path="spending.curve.75" data-unit="pct" min="20" max="150" step="1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>85 岁时支出系数</label><div class="input-wrap"><input type="number" data-path="spending.curve.85" data-unit="pct" min="20" max="150" step="1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>95 岁时支出系数</label><div class="input-wrap"><input type="number" data-path="spending.curve.95" data-unit="pct" min="20" max="150" step="1"><span class="suffix">%</span></div></div>
+          <p class="help">只作用于“基础生活”；医疗、保险、护理不随年龄系数下降。</p>
+        </div>
+        <div class="group">
+          <div class="group-title">大件 / 一次性支出 <span>今天币值</span></div>
+          <div id="oneoffs-list"></div>
+          <button class="btn secondary" id="add-oneoff" type="button" style="padding:6px 10px;font-size:12px;margin-top:4px">+ 添加一项</button>
+          <p class="help">换车、装修、长途旅行、子女婚房等。金额会随 CPI 膨胀。</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="income">
+        <div class="group">
+          <div class="group-title">工作收入 <span>停止工作前</span></div>
+          <div class="field"><label>你的税后年收入</label><div class="input-wrap"><input type="number" data-path="income.salary" data-unit="wan" min="0" step="1"><span class="suffix">万元/年</span></div></div>
+          <div class="field spouse-only"><label>配偶税后年收入</label><div class="input-wrap"><input type="number" data-path="income.spouseSalary" data-unit="wan" min="0" step="1"><span class="suffix">万元/年</span></div></div>
+          <div class="field">
+            <label>年储蓄</label>
+            <div class="input-wrap"><select data-path="income.savingsMode">
+              <option value="auto">自动：收入 − 当前支出</option>
+              <option value="manual">手动输入</option>
+            </select></div>
+          </div>
+          <div class="field" id="savings-manual"><label>每年新增储蓄</label><div class="input-wrap"><input type="number" data-path="income.savingsAnnual" data-unit="wan" min="0" step="1"><span class="suffix">万元/年</span></div></div>
+          <p class="help">若“停止工作年龄”等于当前年龄，工作收入与储蓄不参与计算。</p>
+        </div>
+        <div class="group">
+          <div class="group-title">社保养老金 <span>今天币值</span></div>
+          <div class="field">
+            <label>计算方式</label>
+            <div class="input-wrap"><select data-path="income.pensionMode">
+              <option value="formula">按公式估算（推荐）</option>
+              <option value="direct">直接输入预计金额</option>
+              <option value="none">没有 / 不计入</option>
+            </select></div>
+          </div>
+          <div class="pension-formula">
+            <div class="field"><label>你的缴费年限</label><div class="input-wrap"><input type="number" data-path="social.contribYears" min="0" max="45" step="1"><span class="suffix">年</span></div></div>
+            <div class="field"><label>平均缴费指数 <span class="hint">0.6–3，按社平 100% 填 1</span></label><div class="input-wrap"><input type="number" data-path="social.contributionIndex" min="0.4" max="3" step="0.05"><span class="suffix">倍</span></div></div>
+            <div class="field"><label>个人账户余额</label><div class="input-wrap"><input type="number" data-path="social.personalAccount" data-unit="wan" min="0" step="1"><span class="suffix">万元</span></div></div>
+            <div class="field"><label>当地社平工资 <span class="hint">全口径，月</span></label><div class="input-wrap"><input type="number" data-path="social.localAverageWage" min="0" step="100"><span class="suffix">元/月</span></div></div>
+            <div class="field"><label>退休年龄</label><div class="input-wrap"><input type="number" data-path="income.pensionStartAge" min="50" max="70" step="1"><span class="suffix">岁</span></div></div>
+            <details class="adv"><summary>养老金高级假设</summary><div class="adv-body">
+              <div class="field"><label>个人账户记账利率</label><div class="input-wrap"><input type="number" data-path="social.accountRate" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%</span></div></div>
+              <div class="field"><label>社平工资名义增长</label><div class="input-wrap"><input type="number" data-path="social.socialWageGrowth" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%</span></div></div>
+              <div class="field"><label>最低缴费年限</label><div class="input-wrap"><input type="number" data-path="social.minContribYears" min="10" max="25" step="1"><span class="suffix">年</span></div></div>
+            </div></details>
+            <div class="spouse-only">
+              <div class="divider"></div>
+              <div class="field"><label>配偶缴费年限</label><div class="input-wrap"><input type="number" data-path="social.spouseContribYears" min="0" max="45" step="1"><span class="suffix">年</span></div></div>
+              <div class="field"><label>配偶平均缴费指数</label><div class="input-wrap"><input type="number" data-path="social.spouseContributionIndex" min="0.4" max="3" step="0.05"><span class="suffix">倍</span></div></div>
+              <div class="field"><label>配偶个人账户</label><div class="input-wrap"><input type="number" data-path="social.spousePersonalAccount" data-unit="wan" min="0" step="1"><span class="suffix">万元</span></div></div>
+              <div class="field"><label>配偶当地社平工资</label><div class="input-wrap"><input type="number" data-path="social.spouseLocalAverageWage" min="0" step="100"><span class="suffix">元/月</span></div></div>
+              <div class="field"><label>配偶退休年龄</label><div class="input-wrap"><input type="number" data-path="income.spousePensionStartAge" min="50" max="70" step="1"><span class="suffix">岁</span></div></div>
+            </div>
+          </div>
+          <div class="pension-direct">
+            <div class="field"><label>你的预计月养老金</label><div class="input-wrap"><input type="number" data-path="income.pensionMonthly" min="0" step="100"><span class="suffix">元/月</span></div></div>
+            <div class="field spouse-only"><label>配偶预计月养老金</label><div class="input-wrap"><input type="number" data-path="income.spousePensionMonthly" min="0" step="100"><span class="suffix">元/月</span></div></div>
+          </div>
+          <div class="field"><label>养老金每年调整率</label><div class="input-wrap"><input type="number" data-path="income.pensionCOLA" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%/年</span></div></div>
+        </div>
+        <div class="group">
+          <div class="group-title">其他收入 <span>可选</span></div>
+          <div class="field"><label>租金净收入</label><div class="input-wrap"><input type="number" data-path="income.rentalAnnual" data-unit="wan" min="0" step="0.1"><span class="suffix">万元/年</span></div></div>
+          <div class="field"><label>半退休 / 副业收入</label><div class="input-wrap"><input type="number" data-path="income.partTimeAnnual" data-unit="wan" min="0" step="1"><span class="suffix">万元/年</span></div></div>
+          <div class="field"><label>持续年数</label><div class="input-wrap"><input type="number" data-path="income.partTimeYears" min="0" max="40" step="1"><span class="suffix">年</span></div></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="invest">
+        <div class="group">
+          <div class="group-title">资产配置 <span>会自动归一化</span></div>
+          <div class="field"><label>A 股 / 中国股票</label><div class="input-wrap"><input type="number" data-path="investment.allocation.cnEquity" data-unit="pct" min="0" max="100" step="1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>全球股票（含美股）</label><div class="input-wrap"><input type="number" data-path="investment.allocation.globalEquity" data-unit="pct" min="0" max="100" step="1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>中国债券</label><div class="input-wrap"><input type="number" data-path="investment.allocation.bonds" data-unit="pct" min="0" max="100" step="1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>现金 / 货币基金</label><div class="input-wrap"><input type="number" data-path="investment.allocation.cash" data-unit="pct" min="0" max="100" step="1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>黄金</label><div class="input-wrap"><input type="number" data-path="investment.allocation.gold" data-unit="pct" min="0" max="100" step="1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>其他 / 另类</label><div class="input-wrap"><input type="number" data-path="investment.allocation.other" data-unit="pct" min="0" max="100" step="1"><span class="suffix">%</span></div></div>
+          <div class="kv" style="margin-top:10px">
+            <span class="k">配置合计</span><span class="v" id="alloc-sum">100%</span>
+            <span class="k">费后几何收益</span><span class="v" id="port-geom">—</span>
+            <span class="k">波动率</span><span class="v" id="port-vol">—</span>
+          </div>
+        </div>
+        <div class="group">
+          <div class="group-title">成本与假设</div>
+          <div class="field"><label>基金 / 投顾费率</label><div class="input-wrap"><input type="number" data-path="investment.fee" data-unit="pct" min="0" max="3" step="0.05"><span class="suffix">%/年</span></div></div>
+          <div class="field"><label>税拖累</label><div class="input-wrap"><input type="number" data-path="investment.taxDrag" data-unit="pct" min="0" max="3" step="0.05"><span class="suffix">%/年</span></div></div>
+          <div class="field"><label>覆盖组合收益 <span class="hint">留空则用配置计算</span></label><div class="input-wrap"><input type="number" data-path="investment.overrideReturn" data-unit="pct" min="-5" max="15" step="0.1" placeholder="自动"><span class="suffix">%/年</span></div></div>
+          <div class="field"><label>覆盖组合波动 <span class="hint">留空则用配置计算</span></label><div class="input-wrap"><input type="number" data-path="investment.overrideVol" data-unit="pct" min="0.5" max="40" step="0.5" placeholder="自动"><span class="suffix">%</span></div></div>
+          <details class="adv"><summary>资产收益 / 波动假设</summary><div class="adv-body">
+            <p class="help">预期收益是费前几何年化假设，不是历史保证。债券用当前收益率锚定，股票用盈利收益率+增长的下调估计。</p>
+            <div class="field"><label>A 股预期收益</label><div class="input-wrap"><input type="number" data-path="investment.expected.cnEquity" data-unit="pct" min="0" max="15" step="0.1"><span class="suffix">%</span></div></div>
+            <div class="field"><label>全球股票预期收益</label><div class="input-wrap"><input type="number" data-path="investment.expected.globalEquity" data-unit="pct" min="0" max="15" step="0.1"><span class="suffix">%</span></div></div>
+            <div class="field"><label>中国债券预期收益</label><div class="input-wrap"><input type="number" data-path="investment.expected.bonds" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%</span></div></div>
+            <div class="field"><label>现金预期收益</label><div class="input-wrap"><input type="number" data-path="investment.expected.cash" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%</span></div></div>
+            <div class="field"><label>黄金预期收益</label><div class="input-wrap"><input type="number" data-path="investment.expected.gold" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%</span></div></div>
+            <div class="field"><label>A 股波动</label><div class="input-wrap"><input type="number" data-path="investment.vol.cnEquity" data-unit="pct" min="5" max="50" step="1"><span class="suffix">%</span></div></div>
+            <div class="field"><label>全球股票波动</label><div class="input-wrap"><input type="number" data-path="investment.vol.globalEquity" data-unit="pct" min="5" max="50" step="1"><span class="suffix">%</span></div></div>
+            <div class="field"><label>债券波动</label><div class="input-wrap"><input type="number" data-path="investment.vol.bonds" data-unit="pct" min="0" max="20" step="0.5"><span class="suffix">%</span></div></div>
+          </div></details>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="risk">
+        <div class="group">
+          <div class="group-title">目标与求解</div>
+          <div class="field">
+            <label>目标置信度 <span class="hint">“不破产”的概率</span></label>
+            <div class="input-wrap"><select data-path="risk.confidence">
+              <option value="0.8">80% · 进取</option>
+              <option value="0.9">90% · 稳健（推荐）</option>
+              <option value="0.95">95% · 保守</option>
+              <option value="0.99">99% · 极稳</option>
+            </select></div>
+          </div>
+          <div class="field"><label>遗产目标</label><div class="input-wrap"><input type="number" data-path="risk.bequest" data-unit="wan" min="0" step="10"><span class="suffix">万元</span></div></div>
+          <div class="field">
+            <label>模拟路径数 <span class="hint">越多越稳，也越慢</span></label>
+            <div class="input-wrap"><select data-path="risk.simulations">
+              <option value="2000">2,000 · 快速</option>
+              <option value="4000">4,000 · 标准</option>
+              <option value="8000">8,000 · 精细</option>
+            </select></div>
+          </div>
+        </div>
+        <div class="group">
+          <div class="group-title">通胀 <span>长期假设，不是当前值</span></div>
+          <div class="field"><label>CPI 中枢</label><div class="input-wrap"><input type="number" data-path="risk.inflationMean" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>CPI 波动</label><div class="input-wrap"><input type="number" data-path="risk.inflationVol" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>医疗通胀超额</label><div class="input-wrap"><input type="number" data-path="risk.medicalInflationSpread" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%/年</span></div></div>
+          <div class="field"><label>教育通胀超额</label><div class="input-wrap"><input type="number" data-path="risk.educationInflationSpread" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%/年</span></div></div>
+        </div>
+        <div class="group">
+          <div class="group-title">收益分布与黑天鹅</div>
+          <div class="field"><label>t 分布自由度 <span class="hint">越小尾巴越厚</span></label><div class="input-wrap"><input type="number" data-path="risk.tdf" min="3" max="30" step="1"><span class="suffix">df</span></div></div>
+          <div class="field"><label>组合暴跌年概率</label><div class="input-wrap"><input type="number" data-path="risk.crashProb" data-unit="pct" min="0" max="20" step="0.5"><span class="suffix">%/年</span></div></div>
+          <div class="field"><label>暴跌幅度</label><div class="input-wrap"><input type="number" data-path="risk.crashSize" data-unit="pct" min="-80" max="0" step="1"><span class="suffix">%</span></div></div>
+        </div>
+        <div class="group">
+          <div class="group-title">医疗大额与长期护理</div>
+          <div class="field"><label>大额医疗年概率（40岁）</label><div class="input-wrap"><input type="number" data-path="risk.medicalShockBaseProb" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%/年</span></div></div>
+          <div class="field"><label>费用中位数</label><div class="input-wrap"><input type="number" data-path="risk.medicalShockMedian" data-unit="wan" min="0" step="1"><span class="suffix">万元</span></div></div>
+          <div class="field"><label>护理月费</label><div class="input-wrap"><input type="number" data-path="risk.ltcCostMonthly" min="0" step="500"><span class="suffix">元/月</span></div></div>
+          <div class="field"><label>护理持续年数</label><div class="input-wrap"><input type="number" data-path="risk.ltcDurationYears" min="1" max="15" step="1"><span class="suffix">年</span></div></div>
+          <div class="field"><label>长护险覆盖比例</label><div class="input-wrap"><input type="number" data-path="risk.ltcCoverage" data-unit="pct" min="0" max="100" step="5"><span class="suffix">%</span></div></div>
+          <details class="adv"><summary>发生率高级参数</summary><div class="adv-body">
+            <div class="field"><label>大额医疗年龄斜率</label><div class="input-wrap"><input type="number" data-path="risk.medicalShockAgeSlope" data-unit="pctpoint" min="0" max="1" step="0.01"><span class="suffix">%/岁</span></div></div>
+            <div class="field"><label>护理发生率（65岁）</label><div class="input-wrap"><input type="number" data-path="risk.ltcBaseProb" data-unit="pct" min="0" max="10" step="0.1"><span class="suffix">%/年</span></div></div>
+            <div class="field"><label>护理年龄斜率</label><div class="input-wrap"><input type="number" data-path="risk.ltcAgeSlope" data-unit="pctpoint" min="0" max="1" step="0.01"><span class="suffix">%/岁</span></div></div>
+          </div></details>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="advanced">
+        <div class="group">
+          <div class="group-title">家庭与住房细节</div>
+          <div class="field"><label>一方去世后支出比例</label><div class="input-wrap"><input type="number" data-path="household.singleSpendingFactor" data-unit="pct" min="40" max="100" step="1"><span class="suffix">%</span></div></div>
+          <div class="field"><label>房价名义增长</label><div class="input-wrap"><input type="number" data-path="housing.houseGrowth" data-unit="pct" min="-10" max="10" step="0.5"><span class="suffix">%/年</span></div></div>
+          <div class="field"><label>房产税率</label><div class="input-wrap"><input type="number" data-path="housing.propertyTaxRate" data-unit="pct" min="0" max="3" step="0.1"><span class="suffix">%/年</span></div></div>
+          <div class="field"><label>寿命尺度</label><div class="input-wrap"><input type="number" data-path="risk.longevityScale" data-unit="pct" min="80" max="120" step="1"><span class="suffix">%</span></div></div>
+        </div>
+        <div class="group">
+          <div class="group-title">说明</div>
+          <div class="callout">
+            个人养老金账户（每年 12,000 元限额、领取时 3% 税）目前未单独建模；它金额小，但税优真实存在。海外资产的汇率风险也未单独建模，默认用人民币计价的全球股票收益近似。
+          </div>
+          <div class="callout" style="margin-top:8px">
+            模型不构成投资、保险、税务或法律建议。所有“预期收益”都是假设；请用区间思维，而不是单点数字。
+          </div>
+        </div>
+        <div class="group">
+          <div class="group-title">恢复</div>
+          <button class="btn secondary" id="reset-all" type="button" style="width:100%">恢复默认参数</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="calc-btn" type="button">重新计算</button>
+        <span class="dirty" id="dirty">参数已改，点击计算</span>
+      </div>
+      <div style="padding:0 16px 14px"><p class="help">首次计算约 2–5 秒；结果会随参数变化，但不会自动重算，避免手机卡顿。</p></div>
+    </aside>
+
+    <!-- ================= 右侧结果 ================= -->
+    <main class="main">
+      <section class="hero" id="hero">
+        <div class="hero-top">
+          <div>
+            <div class="kicker">Financial Independence Capital</div>
+            <h2>在目标置信度下，今天至少需要的可投资净资产</h2>
+          </div>
+          <span class="badge" style="background:rgba(255,255,255,.08);border-color:rgba(231,211,173,.25);color:#efe5d2" id="hero-confidence">90% 置信度</span>
+        </div>
+        <div class="big-number"><span class="num" id="hero-number">—</span><span class="unit" id="hero-unit">万元</span></div>
+        <div class="hero-sub" id="hero-sub">正在准备结果…</div>
+        <div class="hero-grid">
+          <div class="hero-cell"><div class="l">当前资产</div><div class="v" id="hero-assets">—</div><div class="s">不含自住房</div></div>
+          <div class="hero-cell"><div class="l">覆盖率</div><div class="v" id="hero-coverage">—</div><div class="s">当前 / 目标</div></div>
+          <div class="hero-cell"><div class="l">当前资产成功率</div><div class="v" id="hero-success">—</div><div class="s">不再工作、按当前计划</div></div>
+          <div class="hero-cell"><div class="l">活到 90 岁条件下</div><div class="v" id="hero-success-long">—</div><div class="s">剔除早逝路径</div></div>
+        </div>
+        <div class="progress"><i id="hero-progress" style="width:0%"></i></div>
+        <div class="progress-label"><span>0</span><span id="hero-progress-label">目标本金</span></div>
+      </section>
+
+      <section class="metrics">
+        <div class="metric" id="metric-safe">
+          <div class="label">当前资产可支撑的核心生活费 <span class="tag" id="metric-safe-tag">90%</span></div>
+          <div class="value" id="metric-safe-value">—</div>
+          <div class="sub" id="metric-safe-sub">对比当前核心月支出</div>
+        </div>
+        <div class="metric" id="metric-four">
+          <div class="label">4% 法则对照 <span class="tag amber">不是保证</span></div>
+          <div class="value" id="metric-four-value">—</div>
+          <div class="sub" id="metric-four-sub">按本模型成功率</div>
+        </div>
+        <div class="metric" id="metric-spend">
+          <div class="label">首年总支出 <span class="tag">今天币值</span></div>
+          <div class="value" id="metric-spend-value">—</div>
+          <div class="sub" id="metric-spend-sub">含房贷、子女、保险</div>
+        </div>
+        <div class="metric" id="metric-return">
+          <div class="label">组合费后几何收益 <span class="tag" id="metric-return-tag">实际</span></div>
+          <div class="value" id="metric-return-value">—</div>
+          <div class="sub" id="metric-return-sub">扣除费率与税拖累</div>
+        </div>
+      </section>
+
+      <div id="warnings"></div>
+
+      <section class="card pad">
+        <div class="card-title"><h2>先看结论</h2><span class="note">数字会随参数变化；先看量级和方向</span></div>
+        <div id="verdict"></div>
+        <div class="divider"></div>
+        <div class="grid2">
+          <div>
+            <div class="section-label">置信度区间</div>
+            <table class="table" id="confidence-table"><thead><tr><th>目标</th><th>所需本金</th><th>相当于首年支出</th></tr></thead><tbody></tbody></table>
+            <p class="help" id="confidence-note"></p>
+          </div>
+          <div>
+            <div class="section-label">第一年现金流</div>
+            <div class="kv" id="first-year-kv"></div>
+            <p class="help" style="margin-top:8px">首年“总支出/本金”不是安全提取率：房贷、子女、大额支出是临时项，不能直接用 4% 反推。</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid2">
+        <section class="card pad">
+          <div class="card-head"><div><h3>成功率曲线</h3><p>本金越多，成功概率越高；红点是当前资产。</p></div><span class="tag" id="curve-tag">90%</span></div>
+          <div class="chart-scroll"><svg class="chart" id="chart-success" viewBox="0 0 640 280" role="img" aria-label="本金与成功率曲线"></svg></div>
+          <p class="help mobile-only">左右滑动查看完整图表</p>
+          <div class="legend"><span><i style="background:#0d5744"></i>成功率</span><span><i style="background:#b8893f"></i>目标置信度</span><span><i style="background:#a63d35"></i>当前资产</span></div>
+        </section>
+        <section class="card pad">
+          <div class="card-head"><div><h3>为什么不是 25 倍？</h3><p>4% 法则的期限、市场与税费前提，和你的计划不同。</p></div></div>
+          <div id="why-list"></div>
+        </section>
+      </div>
+
+      <section class="card pad">
+        <div class="card-head"><div><h3>资产路径分布</h3><p>按目标本金模拟；阴影是 5–95% 与 25–75% 分位，线是中位数（仅统计当时仍存活的路径）。</p></div><div class="legend"><span><i style="background:rgba(20,115,91,.12)"></i>5–95%</span><span><i style="background:rgba(20,115,91,.22)"></i>25–75%</span><span><i style="background:#0d5744"></i>中位数</span></div></div>
+        <div class="chart-scroll"><svg class="chart wide" id="chart-fan" viewBox="0 0 900 300" role="img" aria-label="资产路径分布"></svg></div>
+        <p class="help mobile-only">左右滑动查看完整图表</p>
+      </section>
+
+      <div class="grid2">
+        <section class="card pad">
+          <div class="card-head"><div><h3>终身支出结构</h3><p>确定性路径，今天币值；不是本金拆解。</p></div></div>
+          <div class="bars" id="lifetime-bars"></div>
+          <p class="help" style="margin-top:10px">这些是“花掉的钱”的累计值，不是所需本金的加总。本金还取决于收益、通胀和时序。</p>
+        </section>
+        <section class="card pad">
+          <div class="card-head"><div><h3>年度支出曲线</h3><p>每 5 年一个柱子；临时支出会形成尖峰。</p></div></div>
+          <div class="chart-scroll"><svg class="chart" id="chart-cashflow" viewBox="0 0 640 280" role="img" aria-label="年度支出结构"></svg></div>
+          <div class="legend" id="cashflow-legend"></div>
+        </section>
+      </div>
+
+      <section class="card pad">
+        <div class="card-head"><div><h3>敏感性：哪个参数最要命</h3><p>横条从“更乐观”到“更悲观”的所需本金；竖线是基准。</p></div><span class="note">敏感性内部同一样本；与主结果有抽样差异</span></div>
+        <div class="chart-scroll"><svg class="chart wide" id="chart-tornado" viewBox="0 0 900 360" role="img" aria-label="敏感性分析"></svg></div>
+        <p class="help mobile-only">左右滑动查看完整图表</p>
+      </section>
+
+      <section class="card pad">
+        <div class="card-head"><div><h3>压力测试</h3><p>在目标本金下，换一种人生剧本，成功率会掉到多少。</p></div><span class="tag amber">不是预测</span></div>
+        <div class="stress-grid" id="stress-grid"></div>
+      </section>
+
+      <section class="card pad">
+        <details class="assump">
+          <summary>数据、假设与模型边界（点开看）</summary>
+          <div id="assumptions"></div>
+        </details>
+      </section>
+
+      <footer class="footer">
+        <span>经济自由本金计算器 v1.0 · 2026-10 · 所有金额为今天购买力</span>
+        <span>规划工具，不构成投资 / 保险 / 税务 / 法律建议</span>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<button class="mobile-fab" id="mobile-params" type="button">调整参数</button>
+
+<div class="loading" id="loading">
+  <div class="loading-card">
+    <div class="spinner"></div>
+    <div class="t">正在模拟你的人生路径</div>
+    <div class="s" id="loading-sub">通胀、收益、寿命、医疗与护理同时抽样…</div>
+  </div>
+</div>
+
+<script id="engine-code" type="text/plain">__ENGINE__</script>
+<script>
+  // 在主线程执行同一份引擎，供快速展示与 Worker 失败时回退
+  (0, eval)(document.getElementById('engine-code').textContent);
+</script>
+<script>__APP__</script>
+</body>
+</html>
