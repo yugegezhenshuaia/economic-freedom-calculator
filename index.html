@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>经济自由本金计算器 · 中国经济自由模型</title>
+<meta name="description" content="用多维参数、蒙特卡洛、社保养老金、医疗与长期护理风险，估算中国个人/家庭不再工作所需的本金。">
+<style>
+  :root{--paper:#f3efe6;--card:#fffdf8;--ink:#17211b;--muted:#65706a;--green:#0d5744;--gold:#b8893f;--line:#dcd3c3}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(900px 500px at 90% 0%,rgba(13,87,68,.10),transparent 55%),var(--paper);color:var(--ink);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}
+  .wrap{max-width:980px;margin:0 auto;padding:34px 20px 60px}
+  .kicker{color:var(--gold);font-size:11px;letter-spacing:.18em;font-weight:700}
+  h1{font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(30px,5vw,48px);line-height:1.2;margin:8px 0 10px;color:var(--green)}
+  .sub{color:var(--muted);font-size:15px;max-width:760px}
+  .hero{background:linear-gradient(135deg,#0b4a3a,#0d5744 55%,#083b2f);color:#f8f2e6;border-radius:22px;padding:26px 28px;margin:26px 0 20px;box-shadow:0 18px 44px rgba(13,68,53,.18)}
+  .hero .l{color:#c9b996;font-size:12px}
+  .hero .n{font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(38px,7vw,62px);font-weight:700;line-height:1.1;margin:2px 0}
+  .hero .n span{font-size:18px;color:#d9c7a4;font-weight:400}
+  .hero p{color:#cfc0a4;font-size:13px;margin:6px 0 0}
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 10px 26px rgba(23,33,27,.05)}
+  .card .k{color:var(--muted);font-size:11.5px}
+  .card .v{font-family:"Noto Serif SC","Songti SC",serif;font-size:24px;font-weight:700;margin-top:2px}
+  .card .s{color:var(--muted);font-size:11px;margin-top:2px}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+  .btn{display:inline-block;background:var(--green);color:#fbf5e8;text-decoration:none;padding:11px 17px;border-radius:10px;font-weight:700;font-size:14px;box-shadow:0 8px 18px rgba(13,87,68,.18)}
+  .btn.alt{background:#f1eadc;color:#49544d;box-shadow:none;border:1px solid var(--line)}
+  h2{font-family:"Noto Serif SC","Songti SC",serif;font-size:22px;margin:30px 0 8px;color:var(--green)}
+  p{font-size:14px;color:#38443d}
+  ul{font-size:14px;color:#38443d;padding-left:20px}
+  li{margin:4px 0}
+  img{max-width:100%;border:1px solid var(--line);border-radius:14px;display:block;margin:12px 0}
+  .note{font-size:12px;color:var(--muted);border-top:1px solid var(--line);margin-top:26px;padding-top:14px}
+  code{background:#eee7da;padding:1px 5px;border-radius:5px;font-size:12px}
+  @media(max-width:700px){.grid{grid-template-columns:1fr}.hero{padding:20px 18px}.wrap{padding:22px 14px 44px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">ECONOMIC FREEDOM / CHINA 2026</div>
+  <h1>经济自由本金计算器</h1>
+  <p class="sub">一个人或一个家庭，究竟至少需要多少本金，才可以说“完全经济自由”？这个模型把支出、通胀、社保养老金、医疗、长期护理、子女、大额支出、长寿、收益序列和黑天鹅放在同一条现金流里，用蒙特卡洛和压力测试给出概率答案。</p>
+
+  <div class="hero">
+    <div class="l">默认家庭 · 90% 置信度 · 今天币值</div>
+    <div class="n">1,862 <span>万元</span></div>
+    <p>40/38 岁夫妻，一个 6 岁孩子；可投资资产 300 万；核心生活 1.4 万/月；现在停止工作；规划到 100 岁。</p>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="k">80% / 95% / 99% 区间</div><div class="v">1,482 / 2,268 / 3,414 万</div><div class="s">置信度越高，本金越高</div></div>
+    <div class="card"><div class="k">4% 法则对照</div><div class="v">700 万</div><div class="s">在本模型下成功率 15.6%</div></div>
+    <div class="card"><div class="k">当前资产 300 万</div><div class="v">0%</div><div class="s">90% 置信度下成功率</div></div>
+  </div>
+
+  <div class="actions">
+    <a class="btn" href="经济自由计算器.html">打开交互计算器</a>
+    <a class="btn alt" href="经济自由本金模型说明.docx">下载模型说明（DOCX）</a>
+    <a class="btn alt" href="经济自由测算表.xlsx">下载测算表（XLSX）</a>
+    <a class="btn alt" href="README.md">查看 README</a>
+  </div>
+
+  <h2>这个数字为什么不是 25 倍年支出？</h2>
+  <p>4% 法则来自美国 1926–1992 年、30 年、50/50 股债的历史回测；这里是中国、60 年、费后几何 3.84%、通胀 2.0%，还要覆盖医疗、护理、子女、大件和“退休后前 3 年大跌”的序列风险。默认案例的目标本金约等于首年支出的 66.5 倍。</p>
+  <p><strong>90% 不是保证。</strong>它意味着约每 10 条模拟人生有 1 条失败；想要更高把握，看 95%/99%，或者降低支出、晚一点停止工作。</p>
+
+  <h2>模型包含什么</h2>
+  <ul>
+    <li>支出分项：核心生活、医疗、保险、房贷、子女、大件、父母/护理，不同通胀。</li>
+    <li>收入与社保：养老金公式（国发〔2005〕38 号）、延迟退休、个人账户、缴费年限、COLA。</li>
+    <li>投资：6 类资产配置、几何/算术收益、波动、相关性、费率、税拖累、t 分布与暴跌跳跃。</li>
+    <li>寿命：男女分别的 Weibull 生存曲线、夫妻联合寿命、一方去世后支出下降。</li>
+    <li>医疗/护理：年龄相关的大额医疗冲击、失能发生率、持续年数、护理月费。</li>
+    <li>求解：4,000 条路径 + 二分法；输出 80/90/95/99% 区间、成功率曲线、敏感性、压力测试。</li>
+  </ul>
+
+  <img src="assets/calculator_default.png" alt="计算器默认参数下的界面截图">
+
+  <h2>数据与边界</h2>
+  <p>关键数据来自国家统计局、人社部、国家卫健委、中债等；数据截至 2026-10-25。CPI 默认 2.0% 是长期假设，不是当前值（2025 实际 0.0%）；3,162 元是 2023 年企业退休人员月人均，不是 2025 年。完整来源与口径见 DOCX 与计算器“数据、假设与模型边界”。</p>
+  <p class="note">规划工具，不构成投资、保险、税务或法律建议。所有“预期收益”都是假设，不是承诺。</p>
+</div>
+</body>
+</html>
